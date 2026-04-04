@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ポジティブキーワードアプリ</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="app">
+    <!--
+      画面全体の見出しです。
+      アプリの役割がすぐ分かるように、上部に固定で表示します。
+    -->
+    <header class="app-header">
+      <p class="eyebrow">Simple Positive App</p>
+      <h1>ポジティブキーワードメモ</h1>
+      <p class="intro">
+        まずは5つの前向きな言葉を見て、気になったことや思いついたことを入力してみましょう。
+      </p>
+    </header>
+
+    <!--
+      1画面目:
+      ランダムで選ばれた5個のキーワードを表示する画面です。
+      JavaScriptで内容を書き換えるため、空のリストを用意しています。
+    -->
+    <section id="screen-keywords" class="screen active" aria-labelledby="keywords-title">
+      <div class="card">
+        <h2 id="keywords-title">1. キーワードを見る</h2>
+        <p class="section-text">
+          下の5個はランダム表示です。気に入らなければ「再抽選」で入れ替えられます。
+        </p>
+
+        <!-- キーワードを5個表示するエリア -->
+        <ul id="keyword-list" class="keyword-list" aria-live="polite"></ul>
+
+        <!-- ボタンはスマホで押しやすいように縦並びにしています -->
+        <div class="button-group">
+          <button id="shuffle-button" class="button button-sub" type="button">キーワードを再抽選</button>
+          <button id="next-button" class="button button-main" type="button">次へ</button>
+        </div>
+      </div>
+    </section>
+
+    <!--
+      2画面目:
+      1画面目で表示したキーワードを上から順に並べ、
+      それぞれの下に入力欄を1つずつ表示する画面です。
+    -->
+    <section id="screen-inputs" class="screen" aria-labelledby="inputs-title">
+      <div class="card">
+        <h2 id="inputs-title">2. 思いついたことを書く</h2>
+        <p class="section-text">
+          1画面目で表示された順番のまま、5つの入力欄を用意しています。入力内容は自動で保持されます。
+        </p>
+
+        <!-- JavaScriptで5セット分の入力欄を生成します -->
+        <div id="input-list" class="input-list"></div>
+
+        <div class="button-group">
+          <button id="back-button" class="button button-sub" type="button">前の画面へ戻る</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
