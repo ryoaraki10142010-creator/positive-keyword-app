@@ -2,64 +2,72 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ポジティブキーワードアプリ</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>CBM-M</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <main class="app">
-    <!--
-      画面全体の見出しです。
-      アプリの役割がすぐ分かるように、上部に固定で表示します。
-    -->
     <header class="app-header">
-      <p class="eyebrow">Simple Positive App</p>
-      <h1>ポジティブキーワードメモ</h1>
+      <p class="eyebrow">CBM-M</p>
+      <h1>Cognitive Bias Modification for Memory</h1>
       <p class="intro">
-        まずは5つの前向きな言葉を見て、気になったことや思いついたことを入力してみましょう。
+        5つのポジティブワードを見て覚え、内容の入力とワードリコールを行えるスマホ向けアプリです。
       </p>
     </header>
 
-    <!--
-      1画面目:
-      ランダムで選ばれた5個のキーワードを表示する画面です。
-      JavaScriptで内容を書き換えるため、空のリストを用意しています。
-    -->
     <section id="screen-keywords" class="screen active" aria-labelledby="keywords-title">
       <div class="card">
-        <h2 id="keywords-title">1. キーワードを見る</h2>
+        <div class="section-heading">
+          <span class="step-badge">Step 1</span>
+          <h2 id="keywords-title">キーワードを見る</h2>
+        </div>
         <p class="section-text">
-          下の5個はランダム表示です。気に入らなければ「再抽選」で入れ替えられます。
+          表示された5つのポジティブワードを確認してください。変更ボタンで新しい組み合わせに切り替えられます。
         </p>
 
-        <!-- キーワードを5個表示するエリア -->
         <ul id="keyword-list" class="keyword-list" aria-live="polite"></ul>
 
-        <!-- ボタンはスマホで押しやすいように縦並びにしています -->
         <div class="button-group">
-          <button id="shuffle-button" class="button button-sub" type="button">キーワードを再抽選</button>
-          <button id="next-button" class="button button-main" type="button">次へ</button>
+          <button id="shuffle-button" class="button button-sub" type="button">キーワードを変更</button>
+          <button id="next-button" class="button button-main" type="button">Step 2へ進む</button>
         </div>
       </div>
     </section>
 
-    <!--
-      2画面目:
-      1画面目で表示したキーワードを上から順に並べ、
-      それぞれの下に入力欄を1つずつ表示する画面です。
-    -->
     <section id="screen-inputs" class="screen" aria-labelledby="inputs-title">
       <div class="card">
-        <h2 id="inputs-title">2. 思いついたことを書く</h2>
+        <div class="section-heading">
+          <span class="step-badge">Step 2</span>
+          <h2 id="inputs-title">思い出した内容を入力</h2>
+        </div>
         <p class="section-text">
-          1画面目で表示された順番のまま、5つの入力欄を用意しています。入力内容は自動で保持されます。
+          それぞれのキーワードから思い出した内容を入力してください。入力内容はこの端末内に自動保存されます。
         </p>
 
-        <!-- JavaScriptで5セット分の入力欄を生成します -->
         <div id="input-list" class="input-list"></div>
 
         <div class="button-group">
-          <button id="back-button" class="button button-sub" type="button">前の画面へ戻る</button>
+          <button id="back-button" class="button button-sub" type="button">Step 1へ戻る</button>
+          <button id="recall-button" class="button button-main" type="button">Step 3へ進む</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="screen-recall" class="screen" aria-labelledby="recall-title">
+      <div class="card">
+        <div class="section-heading">
+          <span class="step-badge">Step 3</span>
+          <h2 id="recall-title">ワードリコール</h2>
+        </div>
+        <p class="section-text">
+          先ほど表示されたポジティブワードを思い出して、5つ分を書き出してください。
+        </p>
+
+        <div id="recall-list" class="input-list"></div>
+
+        <div class="button-group">
+          <button id="recall-back-button" class="button button-sub" type="button">Step 2へ戻る</button>
         </div>
       </div>
     </section>
