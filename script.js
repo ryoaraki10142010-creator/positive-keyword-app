@@ -1,108 +1,89 @@
-/*
-  このアプリでは、以下の流れをJavaScriptで制御します。
-  1. キーワード候補からランダムで5個選ぶ
-  2. 1画面目に表示する
-  3. 「次へ」で2画面目に進み、対応する入力欄を表示する
-  4. 入力内容と選ばれたキーワードを localStorage に保存して保持する
-*/
-
-// 20個以上という要件に合わせて、25個の候補を用意しています。
 const keywordPool = [
-  "笑顔",
-  "感謝",
-  "希望",
   "安心",
+  "希望",
+  "達成",
+  "感謝",
+  "笑顔",
   "成長",
   "挑戦",
-  "優しさ",
-  "勇気",
-  "信頼",
-  "達成",
-  "工夫",
-  "前進",
-  "充実",
-  "自由",
-  "発見",
-  "応援",
-  "つながり",
-  "素直",
   "喜び",
-  "継続",
-  "元気",
-  "協力",
   "自信",
+  "前進",
+  "信頼",
+  "友情",
+  "努力",
+  "充実",
+  "発見",
+  "成功",
+  "素直",
+  "穏やか",
+  "満足",
+  "健康",
+  "自由",
   "学び",
+  "勇気",
+  "感動",
   "未来"
 ];
 
-// localStorage に保存するときの名前です。
-// ひとまとめにしておくと、管理しやすくなります。
 const storageKey = "positive-keyword-app-data";
 
-// HTML側の要素を取得して、あとで使いやすいように変数に入れます。
 const screenKeywords = document.getElementById("screen-keywords");
 const screenInputs = document.getElementById("screen-inputs");
+const screenRecall = document.getElementById("screen-recall");
 const keywordList = document.getElementById("keyword-list");
 const inputList = document.getElementById("input-list");
+const recallList = document.getElementById("recall-list");
 const shuffleButton = document.getElementById("shuffle-button");
 const nextButton = document.getElementById("next-button");
 const backButton = document.getElementById("back-button");
+const recallButton = document.getElementById("recall-button");
+const recallBackButton = document.getElementById("recall-back-button");
 
-/*
-  アプリ全体の現在の状態です。
-  keywords: 今表示している5個のキーワード
-  answers: 入力欄の内容を保存する配列
-  currentScreen: どちらの画面を表示するか
-*/
 let appState = {
   keywords: [],
   answers: ["", "", "", "", ""],
+  recallAnswers: ["", "", "", "", ""],
   currentScreen: "keywords"
 };
 
-// ------------------------------
-// 初期表示に使う処理
-// ------------------------------
-
-// ページを開いたときに一度だけ実行します。
 initializeApp();
 
 function initializeApp() {
-  // 以前のデータが保存されていれば、それを読み込みます。
   const savedData = loadState();
 
   if (savedData) {
     appState = savedData;
   } else {
-    // 初回アクセス時は、新しく5個選びます。
     appState.keywords = pickRandomKeywords(keywordPool, 5);
   }
 
-  // 読み込んだ状態を画面に反映します。
   renderKeywords();
   renderInputs();
+  renderRecallInputs();
   showScreen(appState.currentScreen);
   attachEvents();
   saveState();
 }
 
-// ------------------------------
-// イベント設定
-// ------------------------------
-
 function attachEvents() {
   shuffleButton.addEventListener("click", handleShuffle);
   nextButton.addEventListener("click", handleNext);
   backButton.addEventListener("click", handleBack);
+  recallButton.addEventListener("click", handleRecallNext);
+  recallBackButton.addEventListener("click", handleRecallBack);
 }
 
 function handleShuffle() {
-  // 再抽選したら、入力内容はキーワードに対応しなくなるためリセットします。
   appState.keywords = pickRandomKeywords(keywordPool, 5);
   appState.answers = ["", "", "", "", ""];
+  appState.recallAnswers = ["", "", "", "", ""];
+  appState.currentScreen = "keywords";
 
   renderKeywords();
   renderInputs();
+  renderRecallInputs();
+  showScreen("keywords");
   saveState();
 }
 
@@ -118,41 +99,37 @@ function handleBack() {
   saveState();
 }
 
-// ------------------------------
-// 画面表示の切り替え
-// ------------------------------
-
-function showScreen(screenName) {
-  const isKeywordScreen = screenName === "keywords";
-
-  screenKeywords.classList.toggle("active", isKeywordScreen);
-  screenInputs.classList.toggle("active", !isKeywordScreen);
+function handleRecallNext() {
+  appState.currentScreen = "recall";
+  showScreen("recall");
+  saveState();
 }
 
-// ------------------------------
-// 1画面目の表示
-// ------------------------------
+function handleRecallBack() {
+  appState.currentScreen = "inputs";
+  showScreen("inputs");
+  saveState();
+}
+
+function showScreen(screenName) {
+  screenKeywords.classList.toggle("active", screenName === "keywords");
+  screenInputs.classList.toggle("active", screenName === "inputs");
+  screenRecall.classList.toggle("active", screenName === "recall");
+}
 
 function renderKeywords() {
-  // いったん中身を空にしてから、最新の5件を描画します。
   keywordList.innerHTML = "";
 
   appState.keywords.forEach((keyword, index) => {
     const item = document.createElement("li");
     item.className = "keyword-item";
-
     item.innerHTML = `
       <span class="keyword-number">${index + 1}</span>
       <span class="keyword-text">${keyword}</span>
     `;
-
     keywordList.appendChild(item);
   });
 }
-
-// ------------------------------
-// 2画面目の表示
-// ------------------------------
 
 function renderInputs() {
   inputList.innerHTML = "";
@@ -169,9 +146,9 @@ function renderInputs() {
     input.id = `answer-${index}`;
     input.type = "text";
     input.placeholder = "ここに入力してください";
+    input.autocomplete = "off";
     input.value = appState.answers[index] || "";
 
-    // 入力のたびに状態を更新し、保存もします。
     input.addEventListener("input", (event) => {
       appState.answers[index] = event.target.value;
       saveState();
@@ -183,27 +160,45 @@ function renderInputs() {
   });
 }
 
-// ------------------------------
-// ランダム抽選の処理
-// ------------------------------
+function renderRecallInputs() {
+  recallList.innerHTML = "";
 
-function pickRandomKeywords(sourceArray, count) {
-  // 元の配列を壊さないため、コピーしてから並び替えます。
-  const copiedArray = [...sourceArray];
+  for (let index = 0; index < 5; index += 1) {
+    const wrapper = document.createElement("div");
+    wrapper.className = "input-card";
 
-  // Fisher-Yates シャッフルでランダムに並べ替えます。
-  for (let i = copiedArray.length - 1; i > 0; i -= 1) {
-    const randomIndex = Math.floor(Math.random() * (i + 1));
-    [copiedArray[i], copiedArray[randomIndex]] = [copiedArray[randomIndex], copiedArray[i]];
+    const label = document.createElement("label");
+    label.setAttribute("for", `recall-${index}`);
+    label.textContent = `${index + 1}. 思い出したワード`;
+
+    const input = document.createElement("input");
+    input.id = `recall-${index}`;
+    input.type = "text";
+    input.placeholder = "思い出した単語を入力";
+    input.autocomplete = "off";
+    input.value = appState.recallAnswers[index] || "";
+
+    input.addEventListener("input", (event) => {
+      appState.recallAnswers[index] = event.target.value;
+      saveState();
+    });
+
+    wrapper.appendChild(label);
+    wrapper.appendChild(input);
+    recallList.appendChild(wrapper);
   }
-
-  // 先頭から必要な数だけ取り出します。
-  return copiedArray.slice(0, count);
 }
 
-// ------------------------------
-// 保存と読み込み
-// ------------------------------
+function pickRandomKeywords(sourceArray, count) {
+  const copiedArray = [...sourceArray];
+
+  for (let index = copiedArray.length - 1; index > 0; index -= 1) {
+    const randomIndex = Math.floor(Math.random() * (index + 1));
+    [copiedArray[index], copiedArray[randomIndex]] = [copiedArray[randomIndex], copiedArray[index]];
+  }
+
+  return copiedArray.slice(0, count);
+}
 
 function saveState() {
   localStorage.setItem(storageKey, JSON.stringify(appState));
@@ -219,7 +214,6 @@ function loadState() {
   try {
     const parsedData = JSON.parse(savedText);
 
-    // 保存データが壊れていた場合に備えて、最低限の形を確認します。
     if (!Array.isArray(parsedData.keywords) || parsedData.keywords.length !== 5) {
       return null;
     }
@@ -227,10 +221,10 @@ function loadState() {
     return {
       keywords: parsedData.keywords,
       answers: normalizeAnswers(parsedData.answers),
-      currentScreen: parsedData.currentScreen === "inputs" ? "inputs" : "keywords"
+      recallAnswers: normalizeAnswers(parsedData.recallAnswers),
+      currentScreen: normalizeScreen(parsedData.currentScreen)
     };
   } catch (error) {
-    // JSONとして読めない場合は、保存データを使わず初期状態に戻します。
     return null;
   }
 }
@@ -243,4 +237,12 @@ function normalizeAnswers(answers) {
   }
 
   return safeAnswers;
+}
+
+function normalizeScreen(screenName) {
+  if (screenName === "inputs" || screenName === "recall") {
+    return screenName;
+  }
+
+  return "keywords";
 }
