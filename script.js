@@ -23,7 +23,17 @@ const keywordPool = [
   "学び",
   "勇気",
   "感動",
-  "未来"
+  "未来",
+  "幸福",
+  "平和",
+  "前向き",
+  "優しさ",
+  "活力",
+  "誠実",
+  "尊重",
+  "協力",
+  "応援",
+  "祝福"
 ];
 
 const storageKey = "positive-keyword-app-data";
@@ -38,7 +48,9 @@ const shuffleButton = document.getElementById("shuffle-button");
 const nextButton = document.getElementById("next-button");
 const backButton = document.getElementById("back-button");
 const recallButton = document.getElementById("recall-button");
+const clearInputsButton = document.getElementById("clear-inputs-button");
 const recallBackButton = document.getElementById("recall-back-button");
+const clearRecallButton = document.getElementById("clear-recall-button");
 
 let appState = {
   keywords: [],
@@ -71,7 +83,9 @@ function attachEvents() {
   nextButton.addEventListener("click", handleNext);
   backButton.addEventListener("click", handleBack);
   recallButton.addEventListener("click", handleRecallNext);
+  clearInputsButton.addEventListener("click", handleClearInputs);
   recallBackButton.addEventListener("click", handleRecallBack);
+  clearRecallButton.addEventListener("click", handleClearRecall);
 }
 
 function handleShuffle() {
@@ -109,6 +123,26 @@ function handleRecallBack() {
   appState.currentScreen = "inputs";
   showScreen("inputs");
   saveState();
+}
+
+function handleClearInputs() {
+  if (!confirm("Step 2 の入力内容をすべて削除しますか？")) {
+    return;
+  }
+
+  appState.answers = ["", "", "", "", ""];
+  renderInputs();
+  resetSavedState();
+}
+
+function handleClearRecall() {
+  if (!confirm("Step 3 の入力内容をすべて削除しますか？")) {
+    return;
+  }
+
+  appState.recallAnswers = ["", "", "", "", ""];
+  renderRecallInputs();
+  resetSavedState();
 }
 
 function showScreen(screenName) {
@@ -202,6 +236,11 @@ function pickRandomKeywords(sourceArray, count) {
 
 function saveState() {
   localStorage.setItem(storageKey, JSON.stringify(appState));
+}
+
+function resetSavedState() {
+  localStorage.removeItem(storageKey);
+  saveState();
 }
 
 function loadState() {

@@ -198,6 +198,16 @@ input {
   opacity: 0.92;
 }
 
+.button-danger {
+  background: #fff7ed;
+  color: #b45309;
+  border: 1px solid #fbbf24;
+}
+
+.button-danger:hover {
+  background: #fffbeb;
+}
+
 .input-list {
   margin-bottom: 18px;
 }
